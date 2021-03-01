@@ -14,6 +14,7 @@
       ref="movies"
       :movie-items="movieItems"
       :loading="loading"
+      @deleteMovie = "deleteMovie"
     />
   </v-container>
 </template>
@@ -45,18 +46,15 @@
       getMovies () {
         axios.get('https://youtube-curation.herokuapp.com/rest/1'
         ).then((response) => {
-          // console.log(response.data.user.movies)
+          console.log(response.data.user.movies)
           this.movieItems = response.data.user.movies
-          // setTimeout(() => {
-          //   this.loading = false
-          // }, 1000)
+          setTimeout(() => {
+            this.loading = false
+          }, 1000)
         }).catch((error) => {
           console.log(error)
           this.responseError = ['動画の取得に失敗しました']
         }).finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 1000)
           this.$refs.movies.init() 
         })
       },
@@ -69,14 +67,31 @@
           comment: comment,
         }).then((response) => {
           this.movieItems = response.data.movies
+          setTimeout(() => {
+            this.loading = false
+          }, 1000)
         }).catch((error) => {
           console.log(error)
           this.responseError = ['動画の投稿に失敗しました']
         }).finally(() => {
+          this.$refs.movies.init() 
+        })
+      },
+      deleteMovie(id){
+        this.loading = true
+        this.responseError = []
+        axios.delete('https://youtube-curation.herokuapp.com/rest/' + id
+        ).then((response)=> {
+          console.log(response.data.movies)
+          this.movieItems = response.data.movies
           setTimeout(() => {
             this.loading = false
           }, 1000)
-          this.$refs.movies.init() 
+        }).catch((error)=>{
+          console.log(error)
+          this.responseError = ['動画の削除に失敗しました。']
+        }).finally(()=>{
+          this.$refs.movies.init()
         })
       }
     },
