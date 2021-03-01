@@ -5,14 +5,15 @@
       :formElevation="formElevation"
       @storeMovie="storeMovie"
       />
-    <!-- <v-messages
+    <v-messages
       :value="responseError"
       color="red"
       class="response-error my-5 text-center"
-    /> -->
+    />
     <movies
       ref="movies"
       :movie-items="movieItems"
+      :loading="loading"
     />
   </v-container>
 </template>
@@ -31,8 +32,8 @@
       return {
         formElevation: "10",
          movieItems: [{}],
-        //  responseError:[],
-        //  loading: true,
+         responseError:[],
+         loading: true,
       }
     },
 
@@ -51,29 +52,32 @@
           // }, 1000)
         }).catch((error) => {
           console.log(error)
-          // this.responseError = ['動画の取得に失敗しました']
+          this.responseError = ['動画の取得に失敗しました']
         }).finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 1000)
           this.$refs.movies.init() 
         })
       },
       storeMovie (movieUrl, comment) {
         console.log(movieUrl, comment)
-        // this.loading = true
-        // this.responseError = []
-        // axios.post('https://youtube-curation.herokuapp.com/rest', {
-        //   url: movieUrl,
-        //   comment: comment,
-        // }).then((response) => {
-        //   this.movieItems = response.data.movies
-        // }).catch((error) => {
-        //   console.log(error)
-        //   this.responseError = ['動画の投稿に失敗しました']
-        // }).finally(() => {
-        //   setTimeout(() => {
-        //     this.loading = false
-        //   }, 1000)
-        //   this.$refs.movies.init() 
-        // })
+        this.loading = true
+        this.responseError = []
+        axios.post('https://youtube-curation.herokuapp.com/rest', {
+          url: movieUrl,
+          comment: comment,
+        }).then((response) => {
+          this.movieItems = response.data.movies
+        }).catch((error) => {
+          console.log(error)
+          this.responseError = ['動画の投稿に失敗しました']
+        }).finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 1000)
+          this.$refs.movies.init() 
+        })
       }
     },
   }
